@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans.xsd
+      http://www.springframework.org/schema/security
+      http://www.springframework.org/schema/security/spring-security.xsd">
+    <security:global-method-security pre-post-annotations="enabled"/>
+    <!--保证错误页面和登录页面都是可以直接访问的-->
+    <security:http security="none" pattern="/error.jsp"/>
+    <security:http security="none" pattern="/login.jsp"/>
+    <security:http auto-config="true" use-expressions="false">
+        <security:csrf disabled="true"></security:csrf>
+        <security:form-login
+                default-target-url="/home"
+                login-page="/login.jsp"
+                login-processing-url="/login2"
+                username-parameter="username"
+                password-parameter="password"
+                authentication-failure-url="/login?error=error"
+        />
+        <security:intercept-url pattern="/**" access="ROLE_USER"/>
+    </security:http>
+
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:user-service>
+                <security:user name="user" password="user" authorities="ROLE_USER"/>
+                <security:user name="admin" password="admin" authorities="ROLE_USER, ROLE_ADMIN"/>
+            </security:user-service>
+        </security:authentication-provider>
+    </security:authentication-manager>
+    <bean id="mySuccessHandler" class="com.siiruo.security.handler.MyAuthenticationSuccessHandler"/>
+    <bean id="myFailureHandler" class="com.siiruo.security.handler.MyAuthenticationFailureHandler"/>
+</beans>
